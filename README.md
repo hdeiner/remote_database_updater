@@ -14,6 +14,7 @@ This project will create and use a tool called remote_database_updater.py and de
 <li>AWS EC2 Oracle [Linux]</li>
 <li>AWS EC2 SQL Server [Windows Server]</li>
 </ul>
+
 #### Installation
 Make sure that Python is installed and usable from the command line.
 
@@ -56,17 +57,17 @@ We can just monitor the Vault stuff here to see that nothing is blatantly wrong.
 <BR/><BR/>
 ![run_Locally_MySQL_step_1_bring_up_image_02](assets/run_Locally_MySQL_step_1_bring_up_image_02.png)\
 <BR/>
-Things are getting more interesting.  We'll probably do something similar in the future.  We are setting up an environment for "howarddeiner" in Vault, and identifying where the database connection for that is as well as setting it's started to "created".
+Things are getting more interesting.  We'll probably do something similar in the future.  We are setting up an environment for "howarddeiner" in Vault, and identifying where the database connection for that is located well as setting it's status to "created".
 
 Under the banner of "Waiting for MySQL to start", we are asking a simple request from MySQL ('select count(*) from sys.sys_config;') and looking for a reasonable response.  If we don't get a reasonable response, we sleep for 5 seconds and try again.  We see about 20 seconds of time taken while MySQL spins up, as evidenced by 'ERROR 2013 (HY000): Lost connection to MySQL server at 'reading initial communication packet', system error: 2' errors showing up on the console.
 
-Once we finally are sure that MySQL is ready, we update the status in Vault to "running".
+Once we finally are sure that MySQL is ready, we update the database status in Vault to "running".
 <BR/><BR/>
 ![run_Locally_MySQL_step_1_bring_up_image_03](assets/run_Locally_MySQL_step_1_bring_up_image_03.png)\
 <BR/>
 Now we're seeing remote_database_updater.py do it's magic.
 
-There are 4 SQL scripts being executed that seperate the database into the schema, static data, spacial data, and test data.  Each of these is introduced to the database in turn, all controlled by the part of the script that reads
+There are 4 SQL scripts being executed that seperate the database updates into SQL scripts for the schema, static data, spacial data, and test data.  Each of these is introduced to the database in turn, all controlled by the part of the script that reads
 ```bash
 figlet -w 160 -f small "Create Database"
 cd ../../../..
@@ -81,7 +82,9 @@ localhost,howarddeiner,password,127.0.0.1,root,password,3306,zipster,environment
 localhost,howarddeiner,password,127.0.0.1,root,password,3306,zipster,environment_creators/src/sql/V2_1__Add_Spatial_Data.sql
 localhost,howarddeiner,password,127.0.0.1,root,password,3306,zipster,environment_creators/src/sql/V3_1__Zipcode_Test_Data.sql
 ```
-This is where we specify what machine will be ssj'ed into and how, what machine has the MySQL database, and how to connect to it, and where the file that holds the SQL commands is located.
+This is where we specify what machine will be ssh'ed into and how, what machine has the MySQL database, and how to connect to it, and where the file that holds the SQL commands is located.
+
+ssh_and_run_database_script is responsible for ssh'ing into the machine that will execute the database script updates.  First, it copies the SQL script via SFTP to the ssh machine, and the exedcutes the mysql command on that machine to update the database.
 
 You may well be asking yourself, "Wait a minute.  We are executing on the same machine that the database is running on.  Why ssh into ourselves to run the commands?"  The answer is that we want to gain confidence that as we move up from environment to environment (local, CI, QA, UAT, PREPROD, and PROD), we are testing that we can establish our environment consistently.  This helps make for better products.
 
