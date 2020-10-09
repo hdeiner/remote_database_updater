@@ -1,0 +1,4 @@
+machine,username,password,application_signature,port
+ec2-52-91-119-21.compute-1.amazonaws.com,ubuntu,,vault server -config=/vault/config -dev-root-token-id= -dev-listen-address=0.0.0.0:8200,8200
+ec2-100-26-211-121.compute-1.amazonaws.com,ubuntu,,mysqld --default-authentication-plugin=mysql_native_password,3306
+ec2-54-172-16-254.compute-1.amazonaws.com,ubuntu,,/bin/sh -c java -jar zipster-1.0-SNAPSHOT.jar,8080

@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  spark_service:
+    build:
+      context: ../docker/spark
+      dockerfile: Dockerfile_Zipster_Spark
+    container_name: spark_container
+    ports:
+      - "8080:8080"
+    networks:
+      container_network:
+
+networks:
+  container_network:
+    driver: bridge

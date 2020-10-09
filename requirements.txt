@@ -1,0 +1,8 @@
+#python_version>=3.6
+argparse >= 1.4
+#csv
+#sys
+exitstatus >= 2.0
+paramiko >= 2.7.2
+#time
+regex >= 2020.7.14

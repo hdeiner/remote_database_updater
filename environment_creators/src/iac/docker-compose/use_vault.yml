@@ -1,0 +1,49 @@
+version: "3.3"
+
+services:
+  vault_service:
+    image: howarddeiner/zipster-aws-on-demand-vault
+    container_name: vault_container
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault_logs:/vault/logs
+      - vault_files:/vault/file
+#      - ./vault/config:/vault/config
+
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: 'http://0.0.0.0:8200'
+      VAULT_API_ADDR: 'http://0.0.0.0:8200'
+      VAULT_LOCAL_CONFIG: >-
+        {
+          "listener": [{
+                         "tcp": {
+                           "address": "0.0.0.0:8200",
+                           "tls_disable" : 1
+                         }
+                       }],
+          "storage": {
+            "file": {
+              "path" : "/vault/data"
+            }
+          },
+          "max_lease_ttl": "10h",
+          "default_lease_ttl": "10h",
+          "ui": true
+        }
+    command: server
+    restart: unless-stopped
+    networks:
+      container_network:
+
+volumes:
+  vault_logs:
+    driver: local
+  vault_files:
+    driver: local
+
+networks:
+  container_network:
+    driver: bridge
