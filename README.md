@@ -7,7 +7,7 @@ For this project, I am forking code from the https://github.com/hdeiner/zipster-
 
 This project will create and use a tool called remote_database_updater.py and demonstrate it's use in the following environments:
 <ul>
-<li>Local MySLQ [Linux]</li>
+<li>Local MySQL [Linux]</li>
 <li>Local Oracle [Linux]</li>
 <li>Local SQL Server [Linux]</li>
 <li>AWS EC2 MySQL [Linux]</li>
@@ -46,7 +46,7 @@ Spark
 ![createImages_step_3_create_spark_image_02](assets/createImages_step_3_create_spark_image_02.png)\
 <BR/>
 ---
-##### Usage - Local Testing for MySQL Databases
+##### Usage - Local MySQL [Linux]
 Here, the pattern of how the testing occurs is introduced.  The is a "bring_up" script, a "test" script, and a "bring down" script.  Our primary attention is the "bring_up" script, as that's where remote_database_updater.py is used.
 
 Bring Up
@@ -101,4 +101,70 @@ The screen shots for 02_test.sh and 03_bring_down.sh are not shown for briveity.
 Complete.  Repeatable.  Informative.  Schedulable.  Portable.
 
 And fairly easy!
+<BR/>
+---
+##### Usage - AWS EC2 MySQL [Linux]
+Since this project needs environments to test from, I chose to use AWS EC2 istances to create a repeatable environment to demonstrate how the code gets used in real life.  As you recall, there are three components for the environments: a global Vault server, an environment database (MySQL here) server, and an application server (the zipster code, written in Java and using Spark, for a REST service).
+
+Let's go through the commands that demonstrate the code.  I will try to keep the unnecessary complexities of Terraform and AWS to a minimum.
+<BR/><BR/>
+The first thing that has to be done is to have that global Vault environment established.  It starts with
+![run_AWS_MySQL_step_1_bring_up_image_01.png](assets/run_AWS_MySQL_step_1_bring_up_image_01.png)\
+and end with
+<BR/>
+![run_AWS_MySQL_step_1_bring_up_image_02.png](assets/run_AWS_MySQL_step_1_bring_up_image_02.png)\
+<BR/>
+By using that output at the end,
+```console
+Vault DNS is
+ec2-52-91-182-193.compute-1.amazonaws.com
+Vault root token is 
+s.qU4SToxTL2mtgD5aFPQglKa5
+```
+we can login to Vault and see that everything is ready to store values with
+<BR/>
+![run_AWS_MySQL_step_1_bring_up_image_03.png](assets/run_AWS_MySQL_step_1_bring_up_image_03.png)\
+<BR/><BR/>
+The next thing to do is to bring up the AWS EC2 MySQL environment.  The way this Terraform code is structured, it not only creates the environment, but it is also respobsible to provision the environment and get the server running.  It starts with
+![run_AWS_MySQL_step_1_bring_up_image_04.png](assets/run_AWS_MySQL_step_1_bring_up_image_04.png)\
+and end with
+<BR/>
+![run_AWS_MySQL_step_1_bring_up_image_05.png](assets/run_AWS_MySQL_step_1_bring_up_image_05.png)\
+<BR/>
+Our code got executed right before this the end.  The console look like this
+<BR/>
+![run_AWS_MySQL_step_1_bring_up_image_06.png](assets/run_AWS_MySQL_step_1_bring_up_image_06.png)\
+<BR/>
+So, how on earth did our silly little python script get intelligent enough to know which dynamically generated AWS EC2 instance to attach to and run the database updates on?  The secret starts at the end of the terraformResourceMySQL.tf script
+<BR/>
+![run_AWS_MySQL_step_1_bring_up_image_07.png](assets/run_AWS_MySQL_step_1_bring_up_image_07.png)\
+<BR/>
+In particular, let's concentrate on the highlighed provisioner clause.
+```console
+  provisioner "local-exec" {
+    command = "sleep 15 ; cd ../../../../../  ; ./create_awsqa.csv.sh ${self.public_dns} ; python remote_database_updater.py -f awsqa.csv ; cd -"
+  }
+```
+<BR/>
+A new script called create_awsqa.csv.sh is called with the externally generated DNS for the MySQL server.  This creates the awsqa.csv file, which looks like this:
+
+```console
+sql_runner_host,sql_runner_userid,sql_runner_password,database_host,database_userid,database_password,port,database,sql_script_to_run
+ec2-54-224-48-177.compute-1.amazonaws.com,ubuntu,,ec2-54-224-48-177.compute-1.amazonaws.com,root,password,3306,zipster,environment_creators/src/sql/V1_1__Zipcode_Schema.sql
+ec2-54-224-48-177.compute-1.amazonaws.com,ubuntu,,ec2-54-224-48-177.compute-1.amazonaws.com,root,password,3306,zipster,environment_creators/src/sql/V1_2__Zipcode_Static_Data.sql
+ec2-54-224-48-177.compute-1.amazonaws.com,ubuntu,,ec2-54-224-48-177.compute-1.amazonaws.com,root,password,3306,zipster,environment_creators/src/sql/V2_1__Add_Spatial_Data.sql
+ec2-54-224-48-177.compute-1.amazonaws.com,ubuntu,,ec2-54-224-48-177.compute-1.amazonaws.com,root,password,3306,zipster,environment_creators/src/sql/V3_1__Zipcode_Test_Data.sql
+```
+Just for grins, we can look at the AWS Console to verify that, in fact, three EC2 instances are running.  (Of course they are!)
+<BR/>
+![run_AWS_MySQL_step_1_bring_up_image_08.png](assets/run_AWS_MySQL_step_1_bring_up_image_08.png)\
+<BR/>
+We should also test that the environment is all working.
+<BR/>
+![run_AWS_MySQL_step_2_test_image_01.png](assets/run_AWS_MySQL_step_2_test_image_01.png)\
+![run_AWS_MySQL_step_2_test_image_02.png](assets/run_AWS_MySQL_step_2_test_image_02.png)\
+<BR/>
+And then we can bring down the environment.
+<BR/>
+![run_AWS_MySQL_step_3_bring_down_image_01.png](assets/run_AWS_MySQL_step_3_bring_down_image_01.png)\
 <BR/>

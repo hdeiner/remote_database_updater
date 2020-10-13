@@ -9,12 +9,12 @@ aws s3 cp s3://zipster-aws-on-demand-vault/root_token .vault_howardeiner/root_to
 export VAULT_TOKEN=$(<.vault_howardeiner/root_token)
 vault login -address=$VAULT_ADDRESS $VAULT_TOKEN > /dev/null
 
-figlet -w 160 -f small "Get mysql-data from S3"
-cd src/iac/docker-compose
-aws s3 cp s3://zipster-aws-on-demand-mysql mysql-data-download --recursive
-tar -xzf mysql-data-download/mysql-data.tar.gz mysql-data
-rm -rf mysql-data-download/
-cd -
+#figlet -w 160 -f small "Get mysql-data from S3"
+#cd src/iac/docker-compose
+#aws s3 cp s3://zipster-aws-on-demand-mysql mysql-data-download --recursive
+#tar -xzf mysql-data-download/mysql-data.tar.gz mysql-data
+#rm -rf mysql-data-download/
+#cd -
 
 figlet -w 160 -f small "Bring up Local MySQL Container"
 docker-compose -f src/iac/docker-compose/use_mysql.yml up -d
