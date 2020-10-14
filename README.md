@@ -42,8 +42,8 @@ MySQL
 ![createImages_step_2_create_mysql_image_02](assets/createImages_step_2_create_mysql_image_01.png)\
 <BR />
 Spark
-![createImages_step_3_create_spark_image_01](assets/createImages_step_3_create_spark_image_01.png)\
-![createImages_step_3_create_spark_image_02](assets/createImages_step_3_create_spark_image_02.png)\
+![createImages_step_5_create_spark_image_01](assets/createImages_step_5_create_spark_image_01.png)\
+![createImages_step_5_create_spark_image_02](assets/createImages_step_5_create_spark_image_02.png)\
 <BR/>
 ---
 ##### Usage - Local MySQL [Linux]
