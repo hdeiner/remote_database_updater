@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  oracle_service:
+    image: howarddeiner/zipster-aws-on-demand-oracle
+    container_name: oracle_container
+    networks:
+      - backend
+    ports:
+      - "1521:1521"
+      - "8081:8080"
+    restart: unless-stopped
+    environment:
+      ORACLE_ALLOW_REMOTE: "true"
+    volumes:
+      - oracle_data:/ORCL
+volumes:
+  oracle_data:
+networks:
+  backend:

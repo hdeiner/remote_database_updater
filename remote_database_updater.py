@@ -17,7 +17,7 @@ def get_args():
                         help='CSV file with rows for sql_runner_host, sql_runner_userid, sql_runner_password, database_host, database_userid, database_password, port, database, sql_script_to_run',
                         metavar='FILE',
                         type=argparse.FileType('rt'),
-                        default='localhost.csv')
+                        default='localhost_mysql.csv')
 
     args = parser.parse_args()
 
@@ -33,13 +33,14 @@ def main():
             sql_runner_host=row['sql_runner_host']
             sql_runner_userid=row['sql_runner_userid']
             sql_runner_password=row['sql_runner_password']
+            database_type=row['database_type']
             database_host=row['database_host']
             database_userid=row['database_userid']
             database_password=row['database_password']
             port=row['port']
             database=row['database']
             sql_script_to_run=row['sql_script_to_run']
-            success = success and (ssh_and_run_database_script(sql_runner_host, sql_runner_userid, sql_runner_password, database_host, database_userid, database_password, port, database, sql_script_to_run) == exitstatus.ExitStatus.success)
+            success = success and (ssh_and_run_database_script(sql_runner_host, sql_runner_userid, sql_runner_password, database_type, database_host, database_userid, database_password, port, database, sql_script_to_run) == exitstatus.ExitStatus.success)
             print()
 
     if success:

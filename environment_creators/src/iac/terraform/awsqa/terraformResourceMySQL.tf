@@ -130,7 +130,7 @@ resource "aws_instance" "awsqa_mysql" {
     ]
   }
   provisioner "local-exec" {
-    command = "sleep 15 ; cd ../../../../../  ; ./create_awsqa.csv.sh ${self.public_dns} ; python remote_database_updater.py -f awsqa.csv ; cd -"
+    command = "sleep 15 ; cd ../../../../../  ; ./create_awsqa_mysql.csv.sh ${self.public_dns} ; python remote_database_updater.py -f awsqa_mysql.csv ; cd -"
   }
 }
 

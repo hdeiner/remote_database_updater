@@ -2,7 +2,7 @@
 
 figlet -w 160 -f standard "Create MySQL Image"
 
-figlet -w 160 -f small "Bring up Local Vault Container"
+figlet -w 160 -f small "Bring up Local MySQL Container"
 docker-compose -f ../../iac/docker-compose/create_mysql.yml up -d
 
 figlet -w 160 -f small "Wait for MySQL to Start"

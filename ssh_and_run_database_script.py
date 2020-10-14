@@ -3,7 +3,7 @@ import time
 import exitstatus
 import re
 
-def ssh_and_run_database_script(sql_runner_host, sql_runner_userid, sql_runner_password, database_host, database_userid, database_password, port, database, sql_script_to_run):
+def ssh_and_run_database_script(sql_runner_host, sql_runner_userid, sql_runner_password, database_type, database_host, database_userid, database_password, port, database, sql_script_to_run):
     retryCount = 0
     finishedSession = False
 
@@ -24,7 +24,11 @@ def ssh_and_run_database_script(sql_runner_host, sql_runner_userid, sql_runner_p
             ftp_client.put(sql_script_to_run,'/tmp/sql_script_to_run')
             ftp_client.close()
 
-            command_to_run = "mysql -h " + database_host + " -P " + port + " -u " + database_userid + " --password=" + database_password + " " + database + " < /tmp/sql_script_to_run"
+            if (database_type == 'MySQL'):
+                command_to_run = "mysql -h " + database_host + " -P " + port + " -u " + database_userid + " --password=" + database_password + " " + database + " < /tmp/sql_script_to_run"
+            else:
+                raise Exception("Bad database_type of " + database_type)
+
             stdin, stdout, stderr = client.exec_command(command_to_run)
             print("executed " + command_to_run + " on " + sql_runner_host)
 

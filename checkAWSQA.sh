@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if python3 remote_checker.py -f awsqa.csv
+if python3 remote_database_updater.py -f awsqa_mysql.csv
 then
 echo "AWSQA environment is good"
 else

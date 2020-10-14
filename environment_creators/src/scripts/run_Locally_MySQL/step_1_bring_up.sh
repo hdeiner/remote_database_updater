@@ -26,13 +26,6 @@ docker exec vault_container vault operator unseal $(<.vault_howardeiner/unsealke
 docker exec vault_container vault operator unseal $(<.vault_howardeiner/unsealkey_2) > /dev/null
 docker exec vault_container vault operator unseal $(<.vault_howardeiner/unsealkey_3) > /dev/null
 
-#figlet -w 160 -f small "Get mysql-data from S3"
-#cd ../../iac/docker-compose
-#aws s3 cp s3://zipster-aws-on-demand-mysql mysql-data-download --recursive
-#tar -xzf mysql-data-download/mysql-data.tar.gz mysql-data
-#rm -rf mysql-data-download/
-#cd -
-
 figlet -w 160 -f small "Bring up Local MySQL Container"
 docker-compose -f ../../iac/docker-compose/use_mysql.yml up -d
 
@@ -56,12 +49,8 @@ vault kv put -address=$VAULT_ADDRESS ENVIRONMENTS/$ENVIRONMENT/MYSQL address=mys
 
 figlet -w 160 -f small "Create Database"
 cd ../../../..
-python remote_database_updater.py -f localhost.csv
+python remote_database_updater.py -f localhost_mysql.csv
 cd -
-####|#mysql -h $MYSQL_TEST_IP -P 3306 -u root --password=password  zipster  < ../../sql/V1_1__Zipcode_Schema.sql
-####|#mysql -h $MYSQL_TEST_IP -P 3306 -u root --password=password  zipster  < ../../sql/V1_2__Zipcode_Static_Data.sql
-####|#mysql -h $MYSQL_TEST_IP -P 3306 -u root --password=password  zipster  < ../../sql/V2_1__Add_Spatial_Data.sql
-####|#mysql -h $MYSQL_TEST_IP -P 3306 -u root --password=password  zipster  < ../../sql/V3_1__Zipcode_Test_Data.sql
 
 figlet -w 160 -f small "Bring up Local Spark Container"
 # Inside docker-compose environment, containers will talk on their own internal network
@@ -83,4 +72,3 @@ while true ; do
 done
 
 vault kv put -address=$VAULT_ADDRESS ENVIRONMENTS/$ENVIRONMENT/SPARK address=spark_container status=running
-
